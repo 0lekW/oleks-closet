@@ -9,6 +9,7 @@ class ClothingItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=True)
     category = db.Column(db.String(50), nullable=True)  # shirt, pants, shoes, etc.
+    tags = db.Column(db.String(500), nullable=True)  # Comma-separated tags
     
     # File paths (stored relative to static/uploads/)
     original_filename = db.Column(db.String(255), nullable=False)
@@ -22,12 +23,26 @@ class ClothingItem(db.Model):
     def __repr__(self):
         return f'<ClothingItem {self.id}: {self.name or "Unnamed"} ({self.category or "Uncategorized"})>'
     
+    def get_tags_list(self):
+        """Get tags as a list"""
+        if not self.tags:
+            return []
+        return [tag.strip() for tag in self.tags.split(',') if tag.strip()]
+    
+    def set_tags_list(self, tags_list):
+        """Set tags from a list"""
+        if tags_list:
+            self.tags = ', '.join([tag.strip() for tag in tags_list if tag.strip()])
+        else:
+            self.tags = None
+    
     def to_dict(self):
         """Convert model to dictionary for JSON responses"""
         return {
             'id': self.id,
             'name': self.name,
             'category': self.category,
+            'tags': self.get_tags_list(),
             'original_url': f'/static/uploads/original/{self.original_filename}',
             'processed_url': f'/static/uploads/processed/{self.processed_filename}',
             'thumbnail_url': f'/static/uploads/thumbnails/{self.thumbnail_filename}',

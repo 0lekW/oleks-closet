@@ -5,6 +5,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const itemsGrid = document.getElementById('itemsGrid');
     const searchInput = document.getElementById('searchInput');
     const categoryFilter = document.getElementById('categoryFilter');
+    const editModal = document.getElementById('editModal');
+    const editForm = document.getElementById('editForm');
+    const modalClose = document.querySelector('.modal-close');
+    const cancelEdit = document.getElementById('cancelEdit');
 
     // Handle form submission
     uploadForm.addEventListener('submit', async function(e) {
@@ -71,30 +75,35 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Display items in grid
-function displayItems(items) {
-    if (items.length === 0) {
-        itemsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999;">No items found. Upload your first clothing item!</p>';
-        return;
+    function displayItems(items) {
+        if (items.length === 0) {
+            itemsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999;">No items found. Upload your first clothing item!</p>';
+            return;
+        }
+        
+        itemsGrid.innerHTML = items.map(item => `
+            <div class="item-card" data-id="${item.id}">
+                <div class="item-card-actions">
+                    <button class="item-action-btn edit" onclick="editItem(${item.id}, event)" title="Edit">
+                        ✏️
+                    </button>
+                    <button class="item-action-btn delete" onclick="deleteItem(${item.id}, event)" title="Delete">
+                        🗑️
+                    </button>
+                </div>
+                <img src="${item.thumbnail_url}" alt="${item.name || 'Clothing item'}">
+                <div class="item-card-info">
+                    <h3>${item.name || 'Unnamed Item'}</h3>
+                    ${item.category ? `<span class="category">${item.category}</span>` : ''}
+                    ${item.tags && item.tags.length > 0 ? `
+                        <div class="item-tags">
+                            ${item.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `).join('');
     }
-    
-    itemsGrid.innerHTML = items.map(item => `
-        <div class="item-card" data-id="${item.id}">
-            <div class="item-card-actions">
-                <button class="item-action-btn edit" onclick="editItem(${item.id}, event)" title="Edit">
-                    ✏️
-                </button>
-                <button class="item-action-btn delete" onclick="deleteItem(${item.id}, event)" title="Delete">
-                    🗑️
-                </button>
-            </div>
-            <img src="${item.thumbnail_url}" alt="${item.name || 'Clothing item'}">
-            <div class="item-card-info">
-                <h3>${item.name || 'Unnamed Item'}</h3>
-                ${item.category ? `<span class="category">${item.category}</span>` : ''}
-            </div>
-        </div>
-    `).join('');
-}
 
     // Filter handlers
     searchInput.addEventListener('input', debounce(loadItems, 500));
@@ -113,13 +122,9 @@ function displayItems(items) {
         };
     }
 
-    // Initial load
-    loadItems();
-
-
     // Delete item function (global scope for onclick)
     window.deleteItem = async function(itemId, event) {
-        event.stopPropagation(); // Prevent card click
+        event.stopPropagation();
         
         if (!confirm('Are you sure you want to delete this item? This cannot be undone.')) {
             return;
@@ -133,22 +138,8 @@ function displayItems(items) {
             const data = await response.json();
             
             if (response.ok) {
-                // Reload items
                 loadItems();
-                
-                // Show success message briefly
-                const statusDiv = document.createElement('div');
-                statusDiv.className = 'status-message success';
-                statusDiv.textContent = 'Item deleted successfully';
-                statusDiv.style.position = 'fixed';
-                statusDiv.style.top = '20px';
-                statusDiv.style.right = '20px';
-                statusDiv.style.zIndex = '1000';
-                document.body.appendChild(statusDiv);
-                
-                setTimeout(() => {
-                    statusDiv.remove();
-                }, 3000);
+                showToast('Item deleted successfully', 'success');
             } else {
                 alert('Failed to delete item: ' + (data.error || 'Unknown error'));
             }
@@ -157,9 +148,93 @@ function displayItems(items) {
         }
     };
 
-    // Edit item function (placeholder for now)
-    window.editItem = function(itemId, event) {
+    // Edit item function (global scope for onclick)
+    window.editItem = async function(itemId, event) {
         event.stopPropagation();
-        alert('Edit functionality coming next!');
+        
+        try {
+            const response = await fetch(`/items/${itemId}`);
+            const item = await response.json();
+            
+            // Populate form
+            document.getElementById('editItemId').value = item.id;
+            document.getElementById('editName').value = item.name || '';
+            document.getElementById('editCategory').value = item.category || '';
+            document.getElementById('editTags').value = item.tags ? item.tags.join(', ') : '';
+            document.getElementById('editPreview').src = item.processed_url;
+            
+            // Show modal
+            editModal.style.display = 'block';
+        } catch (error) {
+            alert('Failed to load item: ' + error.message);
+        }
     };
+
+    // Handle edit form submission
+    editForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const itemId = document.getElementById('editItemId').value;
+        const name = document.getElementById('editName').value.trim() || null;
+        const category = document.getElementById('editCategory').value.trim() || null;
+        const tagsStr = document.getElementById('editTags').value.trim();
+        const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(t => t) : [];
+        
+        try {
+            const response = await fetch(`/items/${itemId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, category, tags })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                editModal.style.display = 'none';
+                loadItems();
+                showToast('Item updated successfully', 'success');
+            } else {
+                alert('Failed to update item: ' + (data.error || 'Unknown error'));
+            }
+        } catch (error) {
+            alert('Network error: ' + error.message);
+        }
+    });
+
+    // Modal close handlers
+    modalClose.addEventListener('click', () => {
+        editModal.style.display = 'none';
+    });
+    
+    cancelEdit.addEventListener('click', () => {
+        editModal.style.display = 'none';
+    });
+    
+    window.addEventListener('click', (event) => {
+        if (event.target === editModal) {
+            editModal.style.display = 'none';
+        }
+    });
+
+    // Toast notification helper
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `status-message ${type}`;
+        toast.textContent = message;
+        toast.style.position = 'fixed';
+        toast.style.top = '20px';
+        toast.style.right = '20px';
+        toast.style.zIndex = '1000';
+        toast.style.minWidth = '250px';
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
+    // Initial load
+    loadItems();
 });

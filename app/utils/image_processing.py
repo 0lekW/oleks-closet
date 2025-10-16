@@ -85,7 +85,7 @@ def create_thumbnail(input_path, output_path, size=None):
         return False
 
 
-def process_uploaded_image(file, name=None, category=None):
+def process_uploaded_image(file, name=None, category=None, tags=None):
     """
     Complete pipeline for processing an uploaded clothing image
     
@@ -93,6 +93,7 @@ def process_uploaded_image(file, name=None, category=None):
         file: FileStorage object from Flask request
         name: Optional name for the clothing item
         category: Optional category for the clothing item
+        tags: Optional list or comma-separated string of tags
     
     Returns:
         dict: Dictionary with filenames and metadata, or None if failed
@@ -142,6 +143,13 @@ def process_uploaded_image(file, name=None, category=None):
             thumbnail_filename=thumbnail_filename,
             file_size=file_size
         )
+        
+        # Handle tags
+        if tags:
+            if isinstance(tags, str):
+                clothing_item.tags = tags
+            elif isinstance(tags, list):
+                clothing_item.set_tags_list(tags)
         
         db.session.add(clothing_item)
         db.session.commit()

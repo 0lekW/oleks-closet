@@ -32,13 +32,14 @@ def upload():
     # Get optional metadata
     name = request.form.get('name', '').strip() or None
     category = request.form.get('category', '').strip() or None
+    tags = request.form.get('tags', '').strip() or None
     
     # Validate category if provided
     if category and category not in CLOTHING_CATEGORIES:
         return jsonify({'error': 'Invalid category'}), 400
     
     # Process the image
-    result = process_uploaded_image(file, name=name, category=category)
+    result = process_uploaded_image(file, name=name, category=category, tags=tags)
     
     if result is None:
         return jsonify({'error': 'Failed to process image'}), 500
@@ -49,6 +50,41 @@ def upload():
         'item': result
     }), 201
 
+@bp.route('/items/<int:item_id>', methods=['PUT'])
+def update_item(item_id):
+    """Update a clothing item's metadata"""
+    item = ClothingItem.query.get_or_404(item_id)
+    
+    data = request.get_json()
+    
+    # Update name
+    if 'name' in data:
+        item.name = data['name'].strip() or None
+    
+    # Update category
+    if 'category' in data:
+        category = data['category'].strip() or None
+        if category and category not in CLOTHING_CATEGORIES:
+            return jsonify({'error': 'Invalid category'}), 400
+        item.category = category
+    
+    # Update tags
+    if 'tags' in data:
+        if isinstance(data['tags'], list):
+            item.set_tags_list(data['tags'])
+        elif isinstance(data['tags'], str):
+            item.tags = data['tags'].strip() or None
+    
+    try:
+        db.session.commit()
+        return jsonify({
+            'success': True,
+            'message': 'Item updated successfully',
+            'item': item.to_dict()
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 @bp.route('/items')
 def list_items():

@@ -1,0 +1,43 @@
+<!-- Edit Item Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Item</h2>
+            <span class="modal-close">&times;</span>
+        </div>
+        
+        <form id="editForm">
+            <input type="hidden" id="editItemId">
+            
+            <div class="form-group">
+                <label for="editName">Name:</label>
+                <input type="text" id="editName" name="name" placeholder="Item name">
+            </div>
+
+            <div class="form-group">
+                <label for="editCategory">Category:</label>
+                <select id="editCategory" name="category">
+                    <option value="">-- Select Category --</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}">{{ cat.title() }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="editTags">Tags:</label>
+                <input type="text" id="editTags" name="tags" placeholder="Separate with commas">
+                <small>e.g., Nike, Summer, Casual</small>
+            </div>
+
+            <div class="modal-preview">
+                <img id="editPreview" src="" alt="Item preview">
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" id="cancelEdit">Cancel</button>
+                <button type="submit" class="btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
