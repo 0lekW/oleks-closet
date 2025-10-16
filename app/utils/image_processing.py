@@ -62,21 +62,17 @@ def create_thumbnail(input_path, output_path, size=None):
         bool: True if successful, False otherwise
     """
     try:
-        if size is None:
-            size = current_app.config['THUMBNAIL_SIZE']
+        max_width = current_app.config['THUMBNAIL_MAX_WIDTH']
         
         with Image.open(input_path) as img:
-            # Convert RGBA to RGB if needed (for JPEG compatibility)
-            if img.mode == 'RGBA':
-                # Create white background
-                background = Image.new('RGB', img.size, (255, 255, 255))
-                background.paste(img, mask=img.split()[3])  # Use alpha channel as mask
-                img = background
+            # Calculate new height maintaining aspect ratio
+            width, height = img.size
+            if width > max_width:
+                new_width = max_width
+                new_height = int((max_width / width) * height)
+                img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
             
-            # Create thumbnail maintaining aspect ratio
-            img.thumbnail(size, Image.Resampling.LANCZOS)
-            
-            # Save thumbnail
+            # Save thumbnail with transparency intact
             img.save(output_path, 'PNG', optimize=True)
         
         return True

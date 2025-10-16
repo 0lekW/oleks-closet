@@ -20,4 +20,4 @@ class Config:
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
     
     # Thumbnail settings
-    THUMBNAIL_SIZE = (300, 300)
+    THUMBNAIL_MAX_WIDTH = 400  # Max width, height varies by aspect ratio

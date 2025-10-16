@@ -125,24 +125,21 @@ body {
 .items-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-auto-flow: dense;
     gap: 1.5rem;
     padding-bottom: 2rem;
 }
 
 /* Item Cards */
 .item-card {
-    background: white;
-    border: 1px solid #e0e0e0;
+    background: transparent;
+    border: none;
     border-radius: 12px;
-    overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: visible;
     cursor: pointer;
     position: relative;
-}
-
-.item-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
 }
 
 .item-card-actions {
@@ -197,14 +194,32 @@ body {
 
 .item-card img {
     width: 100%;
-    height: 220px;
+    height: auto;
     object-fit: contain;
-    background: #f9f9f9;
+    background: white;
     padding: 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px 12px 0 0;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.item-card:hover img {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
 .item-card-info {
     padding: 1rem;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.item-card:hover .item-card-info {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
 .item-card-info h3 {
