@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
+from flask import Blueprint, render_template, request, jsonify
 from app.models import ClothingItem, CLOTHING_CATEGORIES
 from app.utils import process_uploaded_image
 from app import db
@@ -11,10 +11,6 @@ def index():
     """Home page with upload form"""
     return render_template('index.html', categories=CLOTHING_CATEGORIES)
 
-@bp.route('/builder')
-def builder():
-    """Outfit builder page"""
-    return render_template('outfit_builder.html', categories=CLOTHING_CATEGORIES)
 
 @bp.route('/upload', methods=['POST'])
 def upload():
@@ -49,6 +45,38 @@ def upload():
         'message': 'Image uploaded and processed successfully',
         'item': result
     }), 201
+
+
+@bp.route('/items')
+def list_items():
+    """Get all clothing items (with optional filtering)"""
+    category = request.args.get('category')
+    search = request.args.get('search', '').strip()
+    
+    # Build query
+    query = ClothingItem.query
+    
+    if category:
+        query = query.filter_by(category=category)
+    
+    if search:
+        query = query.filter(ClothingItem.name.ilike(f'%{search}%'))
+    
+    # Order by most recent first
+    items = query.order_by(ClothingItem.upload_date.desc()).all()
+    
+    return jsonify({
+        'items': [item.to_dict() for item in items],
+        'count': len(items)
+    })
+
+
+@bp.route('/items/<int:item_id>')
+def get_item(item_id):
+    """Get a single clothing item"""
+    item = ClothingItem.query.get_or_404(item_id)
+    return jsonify(item.to_dict())
+
 
 @bp.route('/items/<int:item_id>', methods=['PUT'])
 def update_item(item_id):
@@ -85,36 +113,6 @@ def update_item(item_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
-
-@bp.route('/items')
-def list_items():
-    """Get all clothing items (with optional filtering)"""
-    category = request.args.get('category')
-    search = request.args.get('search', '').strip()
-    
-    # Build query
-    query = ClothingItem.query
-    
-    if category:
-        query = query.filter_by(category=category)
-    
-    if search:
-        query = query.filter(ClothingItem.name.ilike(f'%{search}%'))
-    
-    # Order by most recent first
-    items = query.order_by(ClothingItem.upload_date.desc()).all()
-    
-    return jsonify({
-        'items': [item.to_dict() for item in items],
-        'count': len(items)
-    })
-
-
-@bp.route('/items/<int:item_id>')
-def get_item(item_id):
-    """Get a single clothing item"""
-    item = ClothingItem.query.get_or_404(item_id)
-    return jsonify(item.to_dict())
 
 
 @bp.route('/items/<int:item_id>', methods=['DELETE'])

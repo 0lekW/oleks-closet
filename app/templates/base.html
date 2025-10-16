@@ -7,26 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>Closet Fit Maker</h1>
-            <nav>
-                <a href="{{ url_for('main.index') }}">Home</a>
-                <a href="{{ url_for('main.builder') }}">Outfit Builder</a>
-            </nav>
-        </div>
-    </header>
-
-    <main class="container">
-        {% block content %}{% endblock %}
-    </main>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 Closet Fit Maker</p>
-        </div>
-    </footer>
-
+    {% block content %}{% endblock %}
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block extra_js %}{% endblock %}
 </body>

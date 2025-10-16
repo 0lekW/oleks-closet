@@ -1,25 +1,80 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Elements
+    const addButton = document.getElementById('addButton');
+    const addModal = document.getElementById('addModal');
+    const addModalClose = document.getElementById('addModalClose');
+    const cancelAdd = document.getElementById('cancelAdd');
     const uploadForm = document.getElementById('uploadForm');
-    const uploadStatus = document.getElementById('uploadStatus');
     const uploadProgress = document.getElementById('uploadProgress');
     const itemsGrid = document.getElementById('itemsGrid');
+    const itemsGridContainer = document.getElementById('itemsGridContainer');
     const searchInput = document.getElementById('searchInput');
     const categoryFilter = document.getElementById('categoryFilter');
+    const builderToggle = document.getElementById('builderToggle');
+    const builderPanel = document.getElementById('builderPanel');
     const editModal = document.getElementById('editModal');
     const editForm = document.getElementById('editForm');
-    const modalClose = document.querySelector('.modal-close');
+    const editModalClose = document.querySelector('#editModal .modal-close');
     const cancelEdit = document.getElementById('cancelEdit');
 
-    // Handle form submission
+    // Builder toggle functionality
+    builderToggle.addEventListener('click', function() {
+        const isOpen = builderPanel.classList.contains('open');
+        
+        if (isOpen) {
+            closeBuilder();
+        } else {
+            openBuilder();
+        }
+    });
+
+    function openBuilder() {
+        builderPanel.classList.add('open');
+        builderToggle.classList.add('hidden');
+        itemsGridContainer.classList.add('builder-open');
+    }
+
+    function closeBuilder() {
+        builderPanel.classList.remove('open');
+        builderToggle.classList.remove('hidden');
+        itemsGridContainer.classList.remove('builder-open');
+    }
+
+    // Add button - open modal
+    addButton.addEventListener('click', function() {
+        addModal.style.display = 'block';
+    });
+
+    // Close add modal
+    addModalClose.addEventListener('click', function() {
+        addModal.style.display = 'none';
+        uploadForm.reset();
+    });
+
+    cancelAdd.addEventListener('click', function() {
+        addModal.style.display = 'none';
+        uploadForm.reset();
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        if (event.target === addModal) {
+            addModal.style.display = 'none';
+            uploadForm.reset();
+        }
+        if (event.target === editModal) {
+            editModal.style.display = 'none';
+        }
+    });
+
+    // Handle upload form submission
     uploadForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const formData = new FormData(uploadForm);
         const submitBtn = uploadForm.querySelector('button[type="submit"]');
         
-        // Show progress
         uploadProgress.style.display = 'block';
-        uploadStatus.style.display = 'none';
         submitBtn.disabled = true;
         
         try {
@@ -31,24 +86,18 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             
             uploadProgress.style.display = 'none';
-            uploadStatus.style.display = 'block';
             
             if (response.ok) {
-                uploadStatus.className = 'status-message success';
-                uploadStatus.textContent = data.message;
+                addModal.style.display = 'none';
                 uploadForm.reset();
-                
-                // Reload items
                 loadItems();
+                showToast('Item uploaded successfully!', 'success');
             } else {
-                uploadStatus.className = 'status-message error';
-                uploadStatus.textContent = data.error || 'Upload failed';
+                showToast(data.error || 'Upload failed', 'error');
             }
         } catch (error) {
             uploadProgress.style.display = 'none';
-            uploadStatus.style.display = 'block';
-            uploadStatus.className = 'status-message error';
-            uploadStatus.textContent = 'Network error: ' + error.message;
+            showToast('Network error: ' + error.message, 'error');
         } finally {
             submitBtn.disabled = false;
         }
@@ -66,18 +115,22 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const response = await fetch(url);
             const data = await response.json();
-            
             displayItems(data.items);
         } catch (error) {
             console.error('Failed to load items:', error);
-            itemsGrid.innerHTML = '<p>Failed to load items</p>';
+            itemsGrid.innerHTML = '<div class="empty-state"><h3>Failed to load items</h3></div>';
         }
     }
 
     // Display items in grid
     function displayItems(items) {
         if (items.length === 0) {
-            itemsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999;">No items found. Upload your first clothing item!</p>';
+            itemsGrid.innerHTML = `
+                <div class="empty-state">
+                    <h3>No items found</h3>
+                    <p>Click the ADD button to upload your first clothing item!</p>
+                </div>
+            `;
             return;
         }
         
@@ -105,24 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
         `).join('');
     }
 
-    // Filter handlers
-    searchInput.addEventListener('input', debounce(loadItems, 500));
-    categoryFilter.addEventListener('change', loadItems);
-
-    // Debounce utility
-    function debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-
-    // Delete item function (global scope for onclick)
+    // Delete item
     window.deleteItem = async function(itemId, event) {
         event.stopPropagation();
         
@@ -135,20 +171,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: 'DELETE'
             });
             
-            const data = await response.json();
-            
             if (response.ok) {
                 loadItems();
                 showToast('Item deleted successfully', 'success');
             } else {
-                alert('Failed to delete item: ' + (data.error || 'Unknown error'));
+                const data = await response.json();
+                showToast('Failed to delete: ' + (data.error || 'Unknown error'), 'error');
             }
         } catch (error) {
-            alert('Network error: ' + error.message);
+            showToast('Network error: ' + error.message, 'error');
         }
     };
 
-    // Edit item function (global scope for onclick)
+    // Edit item
     window.editItem = async function(itemId, event) {
         event.stopPropagation();
         
@@ -156,17 +191,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const response = await fetch(`/items/${itemId}`);
             const item = await response.json();
             
-            // Populate form
             document.getElementById('editItemId').value = item.id;
             document.getElementById('editName').value = item.name || '';
             document.getElementById('editCategory').value = item.category || '';
             document.getElementById('editTags').value = item.tags ? item.tags.join(', ') : '';
             document.getElementById('editPreview').src = item.processed_url;
             
-            // Show modal
             editModal.style.display = 'block';
         } catch (error) {
-            alert('Failed to load item: ' + error.message);
+            showToast('Failed to load item: ' + error.message, 'error');
         }
     };
 
@@ -189,49 +222,61 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({ name, category, tags })
             });
             
-            const data = await response.json();
-            
             if (response.ok) {
                 editModal.style.display = 'none';
                 loadItems();
                 showToast('Item updated successfully', 'success');
             } else {
-                alert('Failed to update item: ' + (data.error || 'Unknown error'));
+                const data = await response.json();
+                showToast('Failed to update: ' + (data.error || 'Unknown error'), 'error');
             }
         } catch (error) {
-            alert('Network error: ' + error.message);
+            showToast('Network error: ' + error.message, 'error');
         }
     });
 
-    // Modal close handlers
-    modalClose.addEventListener('click', () => {
+    // Edit modal close handlers
+    editModalClose.addEventListener('click', () => {
         editModal.style.display = 'none';
     });
     
     cancelEdit.addEventListener('click', () => {
         editModal.style.display = 'none';
     });
-    
-    window.addEventListener('click', (event) => {
-        if (event.target === editModal) {
-            editModal.style.display = 'none';
-        }
-    });
 
-    // Toast notification helper
+    // Filter handlers
+    searchInput.addEventListener('input', debounce(loadItems, 500));
+    categoryFilter.addEventListener('change', loadItems);
+
+    // Utility functions
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
     function showToast(message, type = 'success') {
         const toast = document.createElement('div');
         toast.className = `status-message ${type}`;
         toast.textContent = message;
         toast.style.position = 'fixed';
-        toast.style.top = '20px';
+        toast.style.top = '100px';
         toast.style.right = '20px';
-        toast.style.zIndex = '1000';
+        toast.style.zIndex = '1001';
         toast.style.minWidth = '250px';
+        toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
         document.body.appendChild(toast);
         
         setTimeout(() => {
-            toast.remove();
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.3s';
+            setTimeout(() => toast.remove(), 300);
         }, 3000);
     }
 
