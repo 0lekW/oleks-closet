@@ -183,11 +183,61 @@ main {
     overflow: hidden;
     transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
+    position: relative;
+}
+
+.item-card-actions {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.2s;
 }
 
 .item-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.item-card:hover .item-card-actions {
+    opacity: 1;
+}
+
+.item-action-btn {
+    background: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: all 0.2s;
+    font-size: 1.1rem;
+}
+
+.item-action-btn.delete {
+    color: #e74c3c;
+}
+
+.item-action-btn.delete:hover {
+    background: #e74c3c;
+    color: white;
+    transform: scale(1.1);
+}
+
+.item-action-btn.edit {
+    color: #3498db;
+}
+
+.item-action-btn.edit:hover {
+    background: #3498db;
+    color: white;
+    transform: scale(1.1);
 }
 
 .item-card img {
