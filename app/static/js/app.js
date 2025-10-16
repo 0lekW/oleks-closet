@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const editForm = document.getElementById('editForm');
     const editModalClose = document.querySelector('#editModal .modal-close');
     const cancelEdit = document.getElementById('cancelEdit');
+    const viewModal = document.getElementById('viewModal');
+    const viewModalClose = document.getElementById('viewModalClose');
 
     // Builder toggle functionality
     builderToggle.addEventListener('click', function() {
@@ -64,6 +66,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (event.target === editModal) {
             editModal.style.display = 'none';
+        }
+        if (event.target === viewModal) {
+            viewModal.style.display = 'none';
         }
     });
 
@@ -135,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         itemsGrid.innerHTML = items.map(item => `
-            <div class="item-card" data-id="${item.id}">
+            <div class="item-card" data-id="${item.id}" onclick="viewItem(${item.id})">
                 <div class="item-card-actions">
                     <button class="item-action-btn edit" onclick="editItem(${item.id}, event)" title="Edit">
                         ✏️
@@ -279,6 +284,67 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => toast.remove(), 300);
         }, 3000);
     }
+
+    // View item modal
+    window.viewItem = async function(itemId) {
+        try {
+            const response = await fetch(`/items/${itemId}`);
+            const item = await response.json();
+            
+            // Set image
+            document.getElementById('viewModalImage').src = item.processed_url;
+            
+            // Set name
+            document.getElementById('viewModalName').textContent = item.name || 'Unnamed Item';
+            
+            // Set category
+            const categoryEl = document.getElementById('viewModalCategory');
+            if (item.category) {
+                categoryEl.textContent = item.category;
+                categoryEl.style.display = 'inline-block';
+            } else {
+                categoryEl.style.display = 'none';
+            }
+            
+            // Set tags
+            const tagsEl = document.getElementById('viewModalTags');
+            if (item.tags && item.tags.length > 0) {
+                tagsEl.innerHTML = item.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+                tagsEl.style.display = 'flex';
+            } else {
+                tagsEl.style.display = 'none';
+            }
+            
+            // Show modal
+            viewModal.style.display = 'block';
+        } catch (error) {
+            showToast('Failed to load item: ' + error.message, 'error');
+        }
+    };
+
+    // Close view modal
+    viewModalClose.addEventListener('click', () => {
+        viewModal.style.display = 'none';
+    });
+
+    // Close modals with Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            // Close add modal
+            if (addModal.style.display === 'block') {
+                addModal.style.display = 'none';
+                uploadForm.reset();
+            }
+            // Close edit modal
+            if (editModal.style.display === 'block') {
+                editModal.style.display = 'none';
+            }
+            // Close view modal
+            if (viewModal.style.display === 'block') {
+                viewModal.style.display = 'none';
+            }
+        }
+    });
 
     // Initial load
     loadItems();
