@@ -33,11 +33,41 @@
         <span class="toggle-arrow">◀</span>
     </div>
 
-    <!-- Builder Panel -->
+   <!-- Builder Panel -->
     <div class="builder-panel" id="builderPanel">
         <div class="builder-content">
-            <!-- Builder content will go here later -->
-            <p style="text-align: center; color: #999; margin-top: 2rem;">Builder coming soon...</p>
+            <!-- Drop Overlay -->
+            <div class="builder-drop-overlay" id="builderDropOverlay">
+                <div class="builder-drop-icon">+</div>
+            </div>
+
+            <!-- Builder Layout -->
+            <div class="builder-layout" id="builderLayout">
+                <!-- Left Column -->
+                <div class="builder-left">
+                    <!-- Top/Outerwear Zone -->
+                    <div class="builder-zone zone-top" id="zoneTop" data-category="top,outerwear">
+                    </div>
+                    <!-- Bottom Zone -->
+                    <div class="builder-zone zone-bottom" id="zoneBottom" data-category="bottom">
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="builder-right">
+                    <!-- Flexible Zone (Hat/Accessories/Other) -->
+                    <div class="builder-zone zone-flexible" id="zoneFlexible" data-category="hat,accessory,other">
+                    </div>
+                    <!-- Shoes Zone -->
+                    <div class="builder-zone zone-shoes" id="zoneShoes" data-category="shoes">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Builder Actions -->
+            <div class="builder-actions">
+                <button id="saveOutfitBtn">Save Outfit (Coming Soon)</button>
+            </div>
         </div>
     </div>
 </div>
