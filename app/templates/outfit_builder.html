@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Outfit Builder - Closet Fit Maker{% endblock %}
+
+{% block content %}
+<div class="outfit-builder">
+    <div class="builder-sidebar">
+        <h2>Your Items</h2>
+        
+        <div class="sidebar-filters">
+            <input type="text" id="builderSearch" placeholder="Search items...">
+            <select id="builderCategoryFilter">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                <option value="{{ cat }}">{{ cat.title() }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="builderItemsList" class="builder-items-list">
+            <!-- Items will be loaded here -->
+        </div>
+    </div>
+
+    <div class="builder-canvas-container">
+        <div class="builder-header">
+            <h2>Outfit Canvas</h2>
+            <div class="builder-actions">
+                <button id="clearOutfit" class="btn-secondary">Clear All</button>
+                <button id="saveOutfit" class="btn-primary">Save Outfit</button>
+            </div>
+        </div>
+
+        <div id="outfitCanvas" class="outfit-canvas">
+            <!-- Outfit layers -->
+            <div class="outfit-layer" data-category="hat">
+                <div class="layer-label">Hat</div>
+                <div class="layer-content" data-layer="hat"></div>
+            </div>
+            
+            <div class="outfit-layer" data-category="top">
+                <div class="layer-label">Top</div>
+                <div class="layer-content" data-layer="top"></div>
+            </div>
+            
+            <div class="outfit-layer" data-category="outerwear">
+                <div class="layer-label">Outerwear</div>
+                <div class="layer-content" data-layer="outerwear"></div>
+            </div>
+            
+            <div class="outfit-layer" data-category="bottom">
+                <div class="layer-label">Bottom</div>
+                <div class="layer-content" data-layer="bottom"></div>
+            </div>
+            
+            <div class="outfit-layer" data-category="shoes">
+                <div class="layer-label">Shoes</div>
+                <div class="layer-content" data-layer="shoes"></div>
+            </div>
+            
+            <div class="outfit-layer" data-category="accessory">
+                <div class="layer-label">Accessories</div>
+                <div class="layer-content" data-layer="accessory"></div>
+            </div>
+        </div>
+
+        <div class="outfit-info">
+            <p>Click on items from the sidebar to add them to your outfit. Items will be placed in the appropriate layer based on their category.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/outfit_builder.js') }}"></script>
+{% endblock %}

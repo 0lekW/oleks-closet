@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="upload-section">
+    <h2>Upload Clothing Item</h2>
+    
+    <form id="uploadForm" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="file">Select Image:</label>
+            <input type="file" id="file" name="file" accept="image/*" required>
+            <small>Supported formats: PNG, JPG, JPEG, WEBP (Max 16MB)</small>
+        </div>
+
+        <div class="form-group">
+            <label for="name">Name (optional):</label>
+            <input type="text" id="name" name="name" placeholder="e.g., Blue Denim Jacket">
+        </div>
+
+        <div class="form-group">
+            <label for="category">Category (optional):</label>
+            <select id="category" name="category">
+                <option value="">-- Select Category --</option>
+                {% for cat in categories %}
+                <option value="{{ cat }}">{{ cat.title() }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn-primary">Upload & Process</button>
+    </form>
+
+    <div id="uploadStatus" class="status-message" style="display: none;"></div>
+    <div id="uploadProgress" class="progress-bar" style="display: none;">
+        <div class="progress-fill"></div>
+        <span class="progress-text">Processing...</span>
+    </div>
+</div>
+
+<div class="items-section">
+    <h2>Your Closet</h2>
+    
+    <div class="filters">
+        <input type="text" id="searchInput" placeholder="Search by name...">
+        <select id="categoryFilter">
+            <option value="">All Categories</option>
+            {% for cat in categories %}
+            <option value="{{ cat }}">{{ cat.title() }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div id="itemsGrid" class="items-grid">
+        <!-- Items will be loaded here via JavaScript -->
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+{% endblock %}
