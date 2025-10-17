@@ -80,7 +80,8 @@ body {
 
 .header-right {
     position: fixed;
-    right: 20%; /* Always centered in the right 40% area (20% from right edge) */
+    right: 20%;
+    transform: translateX(50%);
     top: 0;
     height: 80px;
     display: flex;
