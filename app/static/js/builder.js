@@ -209,111 +209,86 @@ class OutfitBuilder {
     setupFlexibleDrag() {
         const flexibleItems = document.querySelectorAll('.flexible-item');
         
-        flexibleItems.forEach((item, index) => {
-            item.addEventListener('mousedown', (e) => {
+        flexibleItems.forEach((itemEl, index) => {
+            itemEl.addEventListener('mousedown', (e) => {
                 // Don't drag if clicking remove button
                 if (e.target.closest('.builder-item-remove')) return;
                 
-                this.startDragFlexible(index, e);
+                this.startDragFlexible(index, itemEl, e);
                 e.stopPropagation();
+                e.preventDefault();
             });
         });
     }
 
-    startDragFlexible(index, startEvent) {
+    startDragFlexible(index, itemElement, startEvent) {
         const item = this.outfit.flexible[index];
-        const ghost = this.createDragGhost(item);
-        document.body.appendChild(ghost);
         
-        this.draggingItem = {
-            data: item,
-            ghost: ghost
-        };
         this.draggingFromBuilder = true;
         this.draggingFlexibleIndex = index;
         
-        ghost.style.left = startEvent.clientX + 10 + 'px';
-        ghost.style.top = startEvent.clientY + 10 + 'px';
+        // Add dragging class
+        itemElement.classList.add('dragging');
         
-        // Add dragging class to original
-        document.querySelectorAll('.flexible-item')[index].classList.add('dragging');
+        // Store original opacity
+        const originalOpacity = itemElement.style.opacity;
+        itemElement.style.opacity = '0.3';
+        
+        let lastHoveredIndex = null;
 
         const moveHandler = (e) => {
-            if (!this.draggingItem) return;
-            ghost.style.left = e.clientX + 10 + 'px';
-            ghost.style.top = e.clientY + 10 + 'px';
+            // Find which item we're hovering over
+            const flexibleItems = document.querySelectorAll('.flexible-item');
+            let hoveredIndex = null;
             
-            // Check if over another flexible item
-            this.checkFlexibleSwap(e.clientX, e.clientY);
+            flexibleItems.forEach((el, idx) => {
+                if (idx === index) return; // Skip self
+                
+                const rect = el.getBoundingClientRect();
+                const isOver = e.clientX >= rect.left && e.clientX <= rect.right && 
+                              e.clientY >= rect.top && e.clientY <= rect.bottom;
+                
+                if (isOver) {
+                    hoveredIndex = idx;
+                    el.style.background = 'rgba(52, 152, 219, 0.2)';
+                } else {
+                    el.style.background = '';
+                }
+            });
+            
+            lastHoveredIndex = hoveredIndex;
         };
 
         const upHandler = (e) => {
-            this.endFlexibleDrag(e);
+            // Remove dragging class
+            itemElement.classList.remove('dragging');
+            itemElement.style.opacity = originalOpacity;
+            
+            // Clear all backgrounds
+            document.querySelectorAll('.flexible-item').forEach(el => {
+                el.style.background = '';
+            });
+            
+            // Swap items if we have a valid drop target
+            if (lastHoveredIndex !== null && lastHoveredIndex !== index) {
+                // Swap in array
+                const temp = this.outfit.flexible[index];
+                this.outfit.flexible[index] = this.outfit.flexible[lastHoveredIndex];
+                this.outfit.flexible[lastHoveredIndex] = temp;
+                
+                // Re-render
+                this.renderFlexibleZone();
+            }
+            
+            this.draggingFromBuilder = false;
+            this.draggingFlexibleIndex = null;
+            
             document.removeEventListener('mousemove', moveHandler);
             document.removeEventListener('mouseup', upHandler);
         };
 
         document.addEventListener('mousemove', moveHandler);
         document.addEventListener('mouseup', upHandler);
-    }
-
-    checkFlexibleSwap(x, y) {
-        const flexibleItems = document.querySelectorAll('.flexible-item');
-        
-        flexibleItems.forEach((item, index) => {
-            if (index === this.draggingFlexibleIndex) return;
-            
-            const rect = item.getBoundingClientRect();
-            const isOver = x >= rect.left && x <= rect.right && 
-                          y >= rect.top && y <= rect.bottom;
-            
-            if (isOver) {
-                item.style.background = 'rgba(52, 152, 219, 0.2)';
-            } else {
-                item.style.background = '';
-            }
-        });
-    }
-
-    endFlexibleDrag(e) {
-        if (!this.draggingItem || this.draggingFlexibleIndex === null) return;
-        
-        this.draggingItem.ghost.remove();
-        
-        // Check if dropped on another flexible item
-        const flexibleItems = document.querySelectorAll('.flexible-item');
-        let dropIndex = null;
-        
-        flexibleItems.forEach((item, index) => {
-            if (index === this.draggingFlexibleIndex) return;
-            
-            const rect = item.getBoundingClientRect();
-            const isOver = e.clientX >= rect.left && e.clientX <= rect.right && 
-                          e.clientY >= rect.top && e.clientY <= rect.bottom;
-            
-            if (isOver) {
-                dropIndex = index;
-            }
-            
-            item.style.background = '';
-        });
-        
-        // Swap items if dropped on another
-        if (dropIndex !== null) {
-            const temp = this.outfit.flexible[this.draggingFlexibleIndex];
-            this.outfit.flexible[this.draggingFlexibleIndex] = this.outfit.flexible[dropIndex];
-            this.outfit.flexible[dropIndex] = temp;
-            this.renderFlexibleZone();
-        } else {
-            // Remove dragging class
-            document.querySelectorAll('.flexible-item').forEach(item => {
-                item.classList.remove('dragging');
-            });
-        }
-        
-        this.draggingItem = null;
-        this.draggingFromBuilder = false;
-        this.draggingFlexibleIndex = null;
     }
 
     removeFixedItem(zoneId) {
