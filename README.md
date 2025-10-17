@@ -239,3 +239,15 @@ docker-compose down (or however you need to stop service)
 rm -rf data/
 docker-compose up -d
 ```
+
+### Dev TODO list:
+- Replace icons
+- Replace SVG
+- Replace "logo"
+- Cards should use card above them for their y position
+- Save outfits in database
+- Auto categorise items
+- Non random outfit generation
+- Allow multiple photos for a single item
+- Mobile usage in general sucks
+- Upload a Docker image to hub
