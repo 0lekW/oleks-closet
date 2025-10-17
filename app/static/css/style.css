@@ -21,7 +21,6 @@ body {
     right: 0;
     height: 80px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding: 0 2rem;
     z-index: 100;
@@ -32,20 +31,11 @@ body {
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    width: 60%;
-}
-
-.header-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #2c3e50;
-    margin: 0;
-    white-space: nowrap;
 }
 
 .header-search {
     flex: 1;
-    max-width: 300px;
+    max-width: 500px;
     padding: 0.75rem 1rem;
     border: 2px solid #e0e0e0;
     border-radius: 8px;
@@ -66,7 +56,7 @@ body {
     font-size: 0.95rem;
     background: white;
     cursor: pointer;
-    min-width: 150px;
+    min-width: 350px;
 }
 
 .btn-add {
@@ -89,8 +79,13 @@ body {
 }
 
 .header-right {
+    position: fixed;
+    right: 20%; /* Always centered in the right 40% area (20% from right edge) */
+    top: 0;
+    height: 80px;
     display: flex;
     align-items: center;
+    z-index: 100;
 }
 
 .header-logo {
