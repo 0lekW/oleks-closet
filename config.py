@@ -7,8 +7,13 @@ basedir = Path(__file__).parent.absolute()
 class Config:
     """Base configuration"""
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production' # only using locally so not going to deal with this
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        f'sqlite:///{basedir / "closet.db"}'
+    
+    # Database - check if running in Docker
+    if os.environ.get('SQLALCHEMY_DATABASE_URI'):
+        SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
+    else:
+        SQLALCHEMY_DATABASE_URI = f'sqlite:///{basedir / "closet.db"}'
+    
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Upload settings

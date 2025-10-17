@@ -1,39 +1,26 @@
-# Python
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
+*.pyc
+*.pyo
+*.pyd
 .Python
-env/
 venv/
+env/
 ENV/
 .venv
-
-# Flask
-instance/
-.env
-
-# Database
 *.db
 *.sqlite3
-
-# Uploads (we'll add these to gitignore since they're user data)
+.git/
+.gitignore
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
 app/static/uploads/original/*
 app/static/uploads/processed/*
 app/static/uploads/thumbnails/*
 !app/static/uploads/original/.gitkeep
 !app/static/uploads/processed/.gitkeep
 !app/static/uploads/thumbnails/.gitkeep
-
-# Docker volumes
 data/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db

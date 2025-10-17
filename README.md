@@ -1,0 +1,241 @@
+# Oleks Closet
+
+A web application for managing your clothing items and creating outfit combinations with background removal, visual outfit builder, and export functionality.
+
+## Features
+
+- **Upload & Process** - Upload clothing photos with automatic background removal
+- **Organize** - Tag and categorize items (tops, bottoms, shoes, accessories, etc.)
+- **Outfit Builder** - Drag and drop items to create outfit combinations
+- **Randomize** - Generate random outfit combinations
+- **Export** - Save outfit compositions as images
+- **Search & Filter** - Find items by name or category
+
+## Quick Start
+
+### Prerequisites
+
+- Python 3.11+ (for local development)
+- Docker (for containerized deployment)
+
+### Local Development
+
+1. **Clone the repository**
+   ```bash
+   git clone <url>
+   cd oleks_closet
+   ```
+
+2. **Create virtual environment**
+   ```bash
+   python -m venv venv
+   
+   # Windows
+   venv\Scripts\activate
+   
+   # Linux/Mac
+   source venv/bin/activate
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Run the application**
+   ```bash
+   python run.py
+   ```
+
+5. **Open browser**
+   Navigate to `http://localhost:8762`
+
+## Docker Deployment
+
+### Option 1: Using docker-compose (Recommended)
+
+1. **Example compose.yml**
+   ```yaml
+   services:
+   oleks_closet:
+      build: .
+      container_name: oleks_closet
+      ports:
+         - "8762:8762"
+      volumes:
+         - ./data:/app/data
+         - ./app/static/uploads:/app/app/static/uploads
+      environment:
+         - SECRET_KEY=your-secret-key-for-homelab (this is not really important for local hosting)
+         - SQLALCHEMY_DATABASE_URI=sqlite:////app/data/closet.db
+      restart: unless-stopped
+   ```
+
+2. **Build and run**
+   ```bash
+   docker-compose build
+   docker-compose up -d
+   ```
+
+3. **View logs**
+   ```bash
+   docker-compose logs -f
+   ```
+
+4. **Stop**
+   ```bash
+   docker-compose down
+   ```
+
+### Option 2: Plain Docker Commands
+
+1. **Build image**
+   ```bash
+   docker build -t oleks_closet .
+   ```
+
+2. **Run container**
+   
+   **Windows (CMD):**
+   ```bash
+   docker run -d -p 8762:8762 ^
+     --name oleks_closet ^
+     -v "%cd%/data:/app/data" ^
+     -v "%cd%/app/static/uploads:/app/app/static/uploads" ^
+     --restart unless-stopped ^
+     oleks_closet
+   ```
+   
+   **Linux/Mac:**
+   ```bash
+   docker run -d -p 8762:8762 \
+     --name oleks_closet \
+     -v "$(pwd)/data:/app/data" \
+     -v "$(pwd)/app/static/uploads:/app/app/static/uploads" \
+     --restart unless-stopped \
+     oleks_closet
+   ```
+
+3. **Manage container**
+   ```bash
+   docker stop oleks_closet    # Stop
+   docker start oleks_closet   # Start
+   docker restart oleks_closet # Restart
+   docker logs -f oleks_closet # View logs
+   docker rm oleks_closet      # Remove container
+   ```
+
+### Option 3: NixOS Deployment
+
+For NixOS homelab deployments:
+
+```nix
+oleks_closet = {
+  image = "oleks_closet:latest";
+  ports = [ "8762:8762" ];
+  volumes = [
+    "/var/lib/oleks_closet/data:/app/data"
+    "/var/lib/oleks_closet/uploads:/app/app/static/uploads"
+  ];
+  autoStart = true;
+  extraOptions = [ "--network=homelab" ];
+};
+```
+
+## Configuration
+
+### Port Configuration
+
+**Default port:** 8762
+
+**Change port:**
+- **docker-compose:** Edit `ports` in `docker-compose.yml` (e.g., `"9000:8762"`)
+- **docker run:** Change `-p` flag (e.g., `-p 9000:8762`)
+
+### Volume Paths
+
+The application uses two persistent volumes:
+
+| Volume | Purpose | Container Path |
+|--------|---------|----------------|
+| Database | SQLite database with all item metadata | `/app/data` |
+| Uploads | Original, processed, and thumbnail images | `/app/app/static/uploads` |
+
+**Custom volume paths:**
+```bash
+docker run -d -p 8762:8762 \
+  -v /your/custom/path/data:/app/data \
+  -v /your/custom/path/uploads:/app/app/static/uploads \
+  oleks_closet
+```
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SECRET_KEY` | `dev-secret-key-for-homelab` | Flask session secret key |
+| `SQLALCHEMY_DATABASE_URI` | `sqlite:////app/data/closet.db` | Database connection string |
+
+## Project Structure
+
+```
+oleks_closet/
+├── app/
+│   ├── models/          # Database models
+│   ├── routes/          # API endpoints
+│   ├── static/          # CSS, JS, images
+│   │   ├── css/
+│   │   ├── js/
+│   │   ├── images/
+│   │   └── uploads/     # User uploaded images (persistent)
+│   ├── templates/       # HTML templates
+│   └── utils/           # Image processing utilities
+├── data/                # Database storage (persistent)
+├── config.py            # Application configuration
+├── run.py               # Application entry point
+├── requirements.txt     # Python dependencies
+├── Dockerfile           # Docker image definition
+```
+
+## Dependencies
+
+### Python Packages
+- **Flask** - Web framework
+- **Flask-SQLAlchemy** - Database ORM
+- **Pillow** - Image processing
+- **rembg** - AI-powered background removal
+- **html2canvas** (CDN) - Screenshot export
+
+### System Libraries (Docker)
+- `libgl1` - OpenGL support
+- `libglib2.0-0` - Core graphics library
+
+## Troubleshooting
+
+### Background removal not working
+- Ensure rembg model downloads on first use (~170MB), might take a moment
+- Check internet connection for initial model download
+- Verify sufficient disk space
+
+### Images not persisting after restart
+- Ensure volume mounts are configured correctly
+- Check that host directories exist and have write permissions
+- Verify volumes in `docker ps -a` output
+
+### Port already in use
+- Change the host port mapping: `-p 9000:8762`
+- Or stop the conflicting service
+
+### Database Migrations
+
+To reset the database:
+```bash
+# Local
+rm closet.db
+python run.py
+
+# Docker
+docker-compose down (or however you need to stop service)
+rm -rf data/
+docker-compose up -d
+```
