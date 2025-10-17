@@ -13,6 +13,27 @@ body {
     height: 100vh;
 }
 
+/* Fixed Background */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/static/images/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    z-index: -1;
+    opacity: 0.15; /* Adjust this to make it more/less visible (0.1 = very subtle, 0.5 = more visible) */
+}
+
+body.dark-mode::before {
+    filter: invert(1);
+}
+
 /* Page Header - Fixed & Transparent */
 .page-header {
     position: fixed;
@@ -89,11 +110,14 @@ body {
     z-index: 100;
 }
 
-.header-logo {
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: #2c3e50;
-    letter-spacing: 2px;
+.header-logo-img {
+    height: 75px; /* Adjust this to your preferred size */
+    width: auto;
+    object-fit: contain;
+}
+
+body.dark-mode .header-logo-img {
+    filter: invert(1); /* Remove this line if you don't want to invert in dark mode */
 }
 
 /* Content Wrapper */

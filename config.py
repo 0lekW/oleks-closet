@@ -6,7 +6,7 @@ basedir = Path(__file__).parent.absolute()
 
 class Config:
     """Base configuration"""
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production' # only using locally so not going to deal with this
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         f'sqlite:///{basedir / "closet.db"}'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
