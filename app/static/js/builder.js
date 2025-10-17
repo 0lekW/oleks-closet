@@ -323,10 +323,93 @@ class OutfitBuilder {
             setTimeout(() => toast.remove(), 300);
         }, 3000);
     }
+
+    async exportOutfit() {
+        const builderLayout = document.getElementById('builderLayout');
+        const exportBtn = document.getElementById('exportOutfitBtn');
+        
+        // Check if outfit has any items
+        const hasItems = this.outfit.top || this.outfit.bottom || 
+                        this.outfit.shoes || this.outfit.flexible.length > 0;
+        
+        if (!hasItems) {
+            this.showToast('Add some items to your outfit first!', 'error');
+            return;
+        }
+        
+        // Disable button during export
+        exportBtn.disabled = true;
+        exportBtn.textContent = 'Exporting...';
+        
+        try {
+            // Hide remove buttons temporarily
+            const removeButtons = builderLayout.querySelectorAll('.builder-item-remove');
+            removeButtons.forEach(btn => btn.style.display = 'none');
+            
+            // Store original styles for flexible items
+            const flexibleItems = builderLayout.querySelectorAll('.flexible-item');
+            const originalStyles = [];
+            flexibleItems.forEach(item => {
+                const img = item.querySelector('.builder-item-image');
+                originalStyles.push({
+                    element: img,
+                    width: img.style.width,
+                    height: img.style.height,
+                    objectFit: img.style.objectFit
+                });
+                // Force maintain aspect ratio for export
+                img.style.width = 'auto';
+                img.style.height = 'auto';
+                img.style.objectFit = 'contain';
+                img.style.maxWidth = '100%';
+                img.style.maxHeight = '100%';
+            });
+            
+            // Capture the builder layout as canvas
+            const canvas = await html2canvas(builderLayout, {
+                backgroundColor: '#ffffff',
+                scale: 2,
+                logging: false,
+                useCORS: true,
+                allowTaint: true
+            });
+            
+            // Restore original styles
+            originalStyles.forEach(({element, width, height, objectFit}) => {
+                element.style.width = width;
+                element.style.height = height;
+                element.style.objectFit = objectFit;
+            });
+            
+            // Show remove buttons again
+            removeButtons.forEach(btn => btn.style.display = '');
+            
+            // Convert to blob and download
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+                link.download = `outfit-${timestamp}.png`;
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+                
+                this.showToast('Outfit exported successfully!', 'success');
+            });
+            
+        } catch (error) {
+            console.error('Export failed:', error);
+            this.showToast('Failed to export outfit: ' + error.message, 'error');
+        } finally {
+            // Re-enable button
+            exportBtn.disabled = false;
+            exportBtn.textContent = 'Export as Image';
+        }
+    }
 }
 
 // Initialize builder
-let outfitBuilder;
+window.outfitBuilder = null;
 document.addEventListener('DOMContentLoaded', () => {
-    outfitBuilder = new OutfitBuilder();
+    window.outfitBuilder = new OutfitBuilder();
 });

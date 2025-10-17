@@ -346,6 +346,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Export outfit button
+    const exportOutfitBtn = document.getElementById('exportOutfitBtn');
+    if (exportOutfitBtn) {
+        exportOutfitBtn.addEventListener('click', () => {
+            if (window.outfitBuilder) {
+                window.outfitBuilder.exportOutfit();
+            } else {
+                console.error('outfitBuilder not initialized');
+            }
+        });
+    }
+
     // Initial load
     loadItems();
 });

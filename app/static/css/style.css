@@ -514,17 +514,23 @@ body {
 .builder-actions button {
     width: 100%;
     padding: 0.75rem;
-    background: #95a5a6;
+    background: #3498db;
     color: white;
     border: none;
     border-radius: 8px;
     font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
     transition: background 0.3s;
 }
 
 .builder-actions button:hover {
-    background: #7f8c8d;
+    background: #2980b9;
+}
+
+.builder-actions button:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
 }
 
 /* Dragging states */
