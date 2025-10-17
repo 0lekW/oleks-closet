@@ -504,11 +504,29 @@ body {
     padding: 1rem;
     border-top: 1px solid #e0e0e0;
     flex-shrink: 0;
-    height: 60px;
+    display: flex;
+    gap: 1rem;
 }
 
-.builder-actions button {
-    width: 100%;
+.builder-actions .btn-secondary {
+    width: 60px;
+    padding: 0.75rem;
+    background: #6B7280;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.3s;
+    flex-shrink: 0;
+}
+
+.builder-actions .btn-secondary:hover {
+    background: #4B5563;
+}
+
+.builder-actions .btn-primary {
+    flex: 1;
     padding: 0.75rem;
     background: #6B7280;
     color: white;
@@ -520,7 +538,7 @@ body {
     transition: background 0.3s;
 }
 
-.builder-actions button:hover {
+.builder-actions .btn-primary:hover {
     background: #4B5563;
 }
 
@@ -954,6 +972,22 @@ body.dark-mode .builder-zone {
 
 body.dark-mode .builder-actions {
     border-top-color: #4a4a4a;
+}
+
+body.dark-mode .builder-actions .btn-secondary {
+    background: #4a5568;
+}
+
+body.dark-mode .builder-actions .btn-secondary:hover {
+    background: #6B7280;
+}
+
+body.dark-mode .builder-actions .btn-primary {
+    background: #4a5568;
+}
+
+body.dark-mode .builder-actions .btn-primary:hover {
+    background: #6B7280;
 }
 
 body.dark-mode .builder-drop-overlay {

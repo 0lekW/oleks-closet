@@ -360,6 +360,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Randomize outfit button
+    const randomizeOutfitBtn = document.getElementById('randomizeOutfitBtn');
+    if (randomizeOutfitBtn) {
+        randomizeOutfitBtn.addEventListener('click', () => {
+            if (window.outfitBuilder) {
+                window.outfitBuilder.randomizeOutfit();
+            }
+        });
+    }
+
     // Check for saved preference
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode === 'enabled') {

@@ -406,6 +406,87 @@ class OutfitBuilder {
             exportBtn.textContent = 'Export as Image';
         }
     }
+
+    async randomizeOutfit() {
+        try {
+            // Fetch all items
+            const response = await fetch('/items');
+            const data = await response.json();
+            const allItems = data.items;
+            
+            if (allItems.length === 0) {
+                this.showToast('No items available to randomize!', 'error');
+                return;
+            }
+            
+            // Clear current outfit
+            this.outfit = {
+                top: null,
+                bottom: null,
+                shoes: null,
+                flexible: []
+            };
+            
+            // Filter items by category
+            const tops = allItems.filter(item => item.category === 'top' || item.category === 'outerwear');
+            const bottoms = allItems.filter(item => item.category === 'bottom');
+            const shoes = allItems.filter(item => item.category === 'shoes');
+            const hats = allItems.filter(item => item.category === 'hat');
+            const accessories = allItems.filter(item => item.category === 'accessory' || item.category === 'other');
+            
+            // Pick random items
+            if (tops.length > 0) {
+                this.outfit.top = tops[Math.floor(Math.random() * tops.length)];
+                this.renderFixedZone('zoneTop', this.outfit.top);
+            } else {
+                document.getElementById('zoneTop').innerHTML = '';
+            }
+            
+            if (bottoms.length > 0) {
+                this.outfit.bottom = bottoms[Math.floor(Math.random() * bottoms.length)];
+                this.renderFixedZone('zoneBottom', this.outfit.bottom);
+            } else {
+                document.getElementById('zoneBottom').innerHTML = '';
+            }
+            
+            if (shoes.length > 0) {
+                this.outfit.shoes = shoes[Math.floor(Math.random() * shoes.length)];
+                this.renderFixedZone('zoneShoes', this.outfit.shoes);
+            } else {
+                document.getElementById('zoneShoes').innerHTML = '';
+            }
+            
+            // Pick flexible items (max 4, max 1 hat, no duplicates)
+            const flexiblePool = [];
+            const usedIds = new Set();
+            
+            // Add one random hat if available
+            if (hats.length > 0) {
+                const randomHat = hats[Math.floor(Math.random() * hats.length)];
+                flexiblePool.push(randomHat);
+                usedIds.add(randomHat.id);
+            }
+            
+            // Fill remaining slots with accessories (up to 3 more)
+            const remainingSlots = 4 - flexiblePool.length;
+            const shuffledAccessories = accessories
+                .filter(item => !usedIds.has(item.id))
+                .sort(() => Math.random() - 0.5);
+            
+            for (let i = 0; i < Math.min(remainingSlots, shuffledAccessories.length); i++) {
+                flexiblePool.push(shuffledAccessories[i]);
+            }
+            
+            this.outfit.flexible = flexiblePool;
+            this.renderFlexibleZone();
+            
+            this.showToast('Outfit randomized!', 'success');
+            
+        } catch (error) {
+            console.error('Randomize failed:', error);
+            this.showToast('Failed to randomize outfit: ' + error.message, 'error');
+        }
+    }
 }
 
 // Initialize builder
