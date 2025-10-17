@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const cancelEdit = document.getElementById('cancelEdit');
     const viewModal = document.getElementById('viewModal');
     const viewModalClose = document.getElementById('viewModalClose');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const darkModeIcon = document.querySelector('.dark-mode-icon');
 
     // Builder toggle functionality
     builderToggle.addEventListener('click', function() {
@@ -357,6 +359,25 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Check for saved preference
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode === 'enabled') {
+        document.body.classList.add('dark-mode');
+        darkModeIcon.textContent = '☀️';
+    }
+    
+    darkModeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        
+        if (document.body.classList.contains('dark-mode')) {
+            darkModeIcon.textContent = '☀️';
+            localStorage.setItem('darkMode', 'enabled');
+        } else {
+            darkModeIcon.textContent = '🌙';
+            localStorage.setItem('darkMode', 'disabled');
+        }
+    });
 
     // Initial load
     loadItems();
