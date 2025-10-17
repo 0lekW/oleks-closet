@@ -23,7 +23,7 @@ A web application for managing your clothing items and creating outfit combinati
 1. **Clone the repository**
    ```bash
    git clone <url>
-   cd oleks_closet
+   cd oleks-closet
    ```
 
 2. **Create virtual environment**
@@ -57,9 +57,9 @@ A web application for managing your clothing items and creating outfit combinati
 1. **Example compose.yml**
    ```yaml
    services:
-   oleks_closet:
+   oleks-closet:
       build: .
-      container_name: oleks_closet
+      container_name: oleks-closet
       ports:
          - "8762:8762"
       volumes:
@@ -91,7 +91,7 @@ A web application for managing your clothing items and creating outfit combinati
 
 1. **Build image**
    ```bash
-   docker build -t oleks_closet .
+   docker build -t oleks-closet .
    ```
 
 2. **Run container**
@@ -99,30 +99,30 @@ A web application for managing your clothing items and creating outfit combinati
    **Windows (CMD):**
    ```bash
    docker run -d -p 8762:8762 ^
-     --name oleks_closet ^
+     --name oleks-closet ^
      -v "%cd%/data:/app/data" ^
      -v "%cd%/app/static/uploads:/app/app/static/uploads" ^
      --restart unless-stopped ^
-     oleks_closet
+     oleks-closet
    ```
    
    **Linux/Mac:**
    ```bash
    docker run -d -p 8762:8762 \
-     --name oleks_closet \
+     --name oleks-closet \
      -v "$(pwd)/data:/app/data" \
      -v "$(pwd)/app/static/uploads:/app/app/static/uploads" \
      --restart unless-stopped \
-     oleks_closet
+     oleks-closet
    ```
 
 3. **Manage container**
    ```bash
-   docker stop oleks_closet    # Stop
-   docker start oleks_closet   # Start
-   docker restart oleks_closet # Restart
-   docker logs -f oleks_closet # View logs
-   docker rm oleks_closet      # Remove container
+   docker stop oleks-closet    # Stop
+   docker start oleks-closet   # Start
+   docker restart oleks-closet # Restart
+   docker logs -f oleks-closet # View logs
+   docker rm oleks-closet      # Remove container
    ```
 
 ### Option 3: NixOS Deployment
@@ -130,12 +130,12 @@ A web application for managing your clothing items and creating outfit combinati
 For NixOS homelab deployments:
 
 ```nix
-oleks_closet = {
-  image = "oleks_closet:latest";
+oleks-closet = {
+  image = "oleks-closet:latest";
   ports = [ "8762:8762" ];
   volumes = [
-    "/var/lib/oleks_closet/data:/app/data"
-    "/var/lib/oleks_closet/uploads:/app/app/static/uploads"
+    "/var/lib/oleks-closet/data:/app/data"
+    "/var/lib/oleks-closet/uploads:/app/app/static/uploads"
   ];
   autoStart = true;
   extraOptions = [ "--network=homelab" ];
@@ -166,7 +166,7 @@ The application uses two persistent volumes:
 docker run -d -p 8762:8762 \
   -v /your/custom/path/data:/app/data \
   -v /your/custom/path/uploads:/app/app/static/uploads \
-  oleks_closet
+  oleks-closet
 ```
 
 ### Environment Variables
@@ -179,7 +179,7 @@ docker run -d -p 8762:8762 \
 ## Project Structure
 
 ```
-oleks_closet/
+oleks-closet/
 ├── app/
 │   ├── models/          # Database models
 │   ├── routes/          # API endpoints
