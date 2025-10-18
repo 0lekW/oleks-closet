@@ -141,8 +141,12 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        const isMobile = window.innerWidth <= 768;
+        const clickHandler = isMobile ? 'addItemToBuilder' : 'viewItem';
+        
         itemsGrid.innerHTML = items.map(item => `
-            <div class="item-card" data-id="${item.id}" onclick="viewItem(${item.id})">
+            <div class="item-card" data-id="${item.id}" onclick="${clickHandler}(${item.id})">
+                ${item.inBuilder ? '<div class="item-in-builder-badge">✓</div>' : ''}
                 <div class="item-card-actions">
                     <button class="item-action-btn edit" onclick="editItem(${item.id}, event)" title="Edit">
                         <img src="/static/images/icons/edit.png" alt="Edit">
@@ -164,6 +168,31 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `).join('');
     }
+
+    // Add function for mobile tap-to-add
+    window.addItemToBuilder = async function(itemId) {
+        if (!window.outfitBuilder) return;
+        
+        try {
+            const response = await fetch(`/items/${itemId}`);
+            const item = await response.json();
+            
+            window.outfitBuilder.addItemToBuilder(item);
+            
+            // Mark item as in builder
+            const card = document.querySelector(`.item-card[data-id="${itemId}"]`);
+            if (card && !card.querySelector('.item-in-builder-badge')) {
+                const badge = document.createElement('div');
+                badge.className = 'item-in-builder-badge';
+                badge.textContent = '✓';
+                card.insertBefore(badge, card.firstChild);
+            }
+            
+            showToast('Added to outfit!', 'success');
+        } catch (error) {
+            showToast('Failed to add item', 'error');
+        }
+    };
 
     // Delete item
     window.deleteItem = async function(itemId, event) {

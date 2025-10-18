@@ -6,7 +6,7 @@ class OutfitBuilder {
             top: null,
             bottom: null,
             shoes: null,
-            flexible: [] // Max 5 items: hat, accessories, other
+            flexible: []
         };
         
         this.draggingItem = null;
@@ -14,11 +14,27 @@ class OutfitBuilder {
         this.draggingFlexibleIndex = null;
         this.builderDropOverlay = document.getElementById('builderDropOverlay');
         this.builderLayout = document.getElementById('builderLayout');
+        this.isMobile = this.checkMobile();
         this.init();
     }
 
+    checkMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+            || window.innerWidth <= 768;
+    }
+
     init() {
-        this.setupDragFromGrid();
+        if (this.isMobile) {
+            this.setupMobileMode();
+        } else {
+            this.setupDragFromGrid();
+        }
+    }
+
+    setupMobileMode() {
+        // On mobile, tapping an item adds it to the builder
+        // This will be handled by modifying the onclick in app.js
+        console.log('Mobile mode enabled - tap to add items');
     }
 
     setupDragFromGrid() {
@@ -165,9 +181,13 @@ class OutfitBuilder {
         zone.innerHTML = `
             <div class="builder-item-wrapper">
                 <img src="${item.processed_url}" alt="" class="builder-item-image">
-                <button class="builder-item-remove" onclick="outfitBuilder.removeFixedItem('${zoneId}')">&times;</button>
+                <button class="builder-item-remove" onclick="outfitBuilder.removeFixedItem('${zoneId}')">
+                    <img src="/static/images/icons/close.png" alt="Remove">
+                </button>
             </div>
         `;
+
+        this.updateBadges();
     }
 
     renderFlexibleZone() {
@@ -197,13 +217,16 @@ class OutfitBuilder {
             <div class="flexible-item" data-index="${index}">
                 <div class="builder-item-wrapper">
                     <img src="${item.processed_url}" alt="" class="builder-item-image">
-                    <button class="builder-item-remove" onclick="outfitBuilder.removeFlexibleItem(${index})">&times;</button>
+                    <button class="builder-item-remove" onclick="outfitBuilder.removeFlexibleItem(${index})">
+                        <img src="/static/images/icons/close.png" alt="Remove">
+                    </button>
                 </div>
             </div>
         `).join('');
         
         // Setup drag-to-reorder for flexible items
         this.setupFlexibleDrag();
+        this.updateBadges();
     }
 
     setupFlexibleDrag() {
@@ -291,6 +314,51 @@ class OutfitBuilder {
         document.addEventListener('mouseup', upHandler);
     }
 
+    getItemsInBuilder() {
+        const items = new Set();
+        if (this.outfit.top) items.add(this.outfit.top.id);
+        if (this.outfit.bottom) items.add(this.outfit.bottom.id);
+        if (this.outfit.shoes) items.add(this.outfit.shoes.id);
+        this.outfit.flexible.forEach(item => items.add(item.id));
+        return items;
+    }
+
+    // Modify renderFixedZone and renderFlexibleZone to update badges
+    renderFixedZone(zoneId, item) {
+        const zone = document.getElementById(zoneId);
+        
+        zone.innerHTML = `
+            <div class="builder-item-wrapper">
+                <img src="${item.processed_url}" alt="" class="builder-item-image">
+                <button class="builder-item-remove" onclick="outfitBuilder.removeFixedItem('${zoneId}')">
+                    <img src="/static/images/icons/close.png" alt="Remove">
+                </button>
+            </div>
+        `;
+        
+        this.updateBadges();
+    }
+
+    updateBadges() {
+        const itemsInBuilder = this.getItemsInBuilder();
+        
+        document.querySelectorAll('.item-card').forEach(card => {
+            const itemId = parseInt(card.dataset.id);
+            const badge = card.querySelector('.item-in-builder-badge');
+            
+            if (itemsInBuilder.has(itemId)) {
+                if (!badge) {
+                    const newBadge = document.createElement('div');
+                    newBadge.className = 'item-in-builder-badge';
+                    newBadge.textContent = '✓';
+                    card.insertBefore(newBadge, card.firstChild);
+                }
+            } else {
+                if (badge) badge.remove();
+            }
+        });
+    }
+
     removeFixedItem(zoneId) {
         const zone = document.getElementById(zoneId);
         zone.innerHTML = '';
@@ -298,11 +366,14 @@ class OutfitBuilder {
         if (zoneId === 'zoneTop') this.outfit.top = null;
         else if (zoneId === 'zoneBottom') this.outfit.bottom = null;
         else if (zoneId === 'zoneShoes') this.outfit.shoes = null;
+        
+        this.updateBadges();
     }
 
     removeFlexibleItem(index) {
         this.outfit.flexible.splice(index, 1);
         this.renderFlexibleZone();
+        this.updateBadges();
     }
 
     showToast(message, type = 'error') {
@@ -481,6 +552,8 @@ class OutfitBuilder {
             this.renderFlexibleZone();
             
             this.showToast('Outfit randomized!', 'success');
+
+            this.updateBadges();
             
         } catch (error) {
             console.error('Randomize failed:', error);
