@@ -241,9 +241,7 @@ docker-compose up -d
 ```
 
 ### Dev TODO list:
-- Replace icons
 - Replace SVG
-- Replace "logo"
 - Cards should use card above them for their y position
 - Save outfits in database
 - Auto categorise items
