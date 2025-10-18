@@ -17,7 +17,7 @@
         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="header-logo-img">
     </div>
     <button id="darkModeToggle" class="dark-mode-toggle" title="Toggle dark mode">
-        <span class="dark-mode-icon">🌙</span>
+       <img src="{{ url_for('static', filename='images/icons/moon.png') }}" alt="Dark mode" class="dark-mode-icon" id="darkModeIcon">
     </button>
 </div>
 
@@ -69,7 +69,7 @@
             <!-- Builder Actions -->
             <div class="builder-actions">
                 <button id="randomizeOutfitBtn" class="btn-secondary" title="Randomize outfit">
-                    🔀
+                    <img src="{{ url_for('static', filename='images/icons/shuffle.png') }}" alt="Shuffle">
                 </button>
                 <button id="exportOutfitBtn" class="btn-primary">Export as Image</button>
             </div>
@@ -82,7 +82,9 @@
     <div class="modal-content">
         <div class="modal-header">
             <h2>Add New Item</h2>
-            <span class="modal-close" id="addModalClose">&times;</span>
+            <span class="modal-close" id="addModalClose">
+                <img src="{{ url_for('static', filename='images/icons/close.png') }}" alt="Close">
+            </span>
         </div>
         
         <form id="uploadForm" enctype="multipart/form-data">
@@ -129,7 +131,9 @@
 <!-- View Item Modal -->
 <div id="viewModal" class="modal">
     <div class="modal-content view-modal-content">
-        <span class="modal-close" id="viewModalClose">&times;</span>
+        <span class="modal-close" id="viewModalClose">
+            <img src="{{ url_for('static', filename='images/icons/close.png') }}" alt="Close">
+        </span>
         <img id="viewModalImage" src="" alt="Item view">
         <div id="viewModalInfo" class="view-modal-info">
             <h3 id="viewModalName"></h3>

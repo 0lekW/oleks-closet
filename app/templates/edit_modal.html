@@ -3,7 +3,9 @@
     <div class="modal-content">
         <div class="modal-header">
             <h2>Edit Item</h2>
-            <span class="modal-close">&times;</span>
+            <span class="modal-close" id="viewModalClose">
+                <img src="{{ url_for('static', filename='images/icons/close.png') }}" alt="Close">
+            </span>
         </div>
         
         <form id="editForm">

@@ -145,13 +145,13 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="item-card" data-id="${item.id}" onclick="viewItem(${item.id})">
                 <div class="item-card-actions">
                     <button class="item-action-btn edit" onclick="editItem(${item.id}, event)" title="Edit">
-                        ✏️
+                        <img src="/static/images/icons/edit.png" alt="Edit">
                     </button>
                     <button class="item-action-btn delete" onclick="deleteItem(${item.id}, event)" title="Delete">
-                        🗑️
+                        <img src="/static/images/icons/trash.png" alt="Delete">
                     </button>
                 </div>
-                <img src="${item.thumbnail_url}" alt="${item.name || 'Clothing item'}">
+                <img src="${item.thumbnail_url}" alt="${item.name || 'Clothing item'}" class="clothing-photo">
                 <div class="item-card-info">
                     <h3>${item.name || 'Unnamed Item'}</h3>
                     ${item.category ? `<span class="category">${item.category}</span>` : ''}
@@ -374,17 +374,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode === 'enabled') {
         document.body.classList.add('dark-mode');
-        darkModeIcon.textContent = '☀️';
+        darkModeIcon.src = '/static/images/icons/sun.png';
     }
-    
+
     darkModeToggle.addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
         
         if (document.body.classList.contains('dark-mode')) {
-            darkModeIcon.textContent = '☀️';
+            darkModeIcon.src = '/static/images/icons/sun.png';
             localStorage.setItem('darkMode', 'enabled');
         } else {
-            darkModeIcon.textContent = '🌙';
+            darkModeIcon.src = '/static/images/icons/moon.png';
             localStorage.setItem('darkMode', 'disabled');
         }
     });
