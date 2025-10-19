@@ -3,7 +3,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h2>Edit Item</h2>
-            <span class="modal-close" id="viewModalClose">
+            <span class="modal-close">
                 <img src="{{ url_for('static', filename='images/icons/close.png') }}" alt="Close">
             </span>
         </div>
@@ -32,8 +32,20 @@
                 <small>e.g., Nike, Summer, Casual</small>
             </div>
 
-            <div class="modal-preview">
-                <img id="editPreview" src="" alt="Item preview">
+            <div class="form-group">
+                <label>Current Image:</label>
+                <div class="modal-preview-container">
+                    <img id="editPreview" src="" alt="Item preview">
+                    <div class="preview-actions">
+                        <button type="button" id="cropImageBtn" class="preview-action-btn" title="Crop Image">
+                            <img src="{{ url_for('static', filename='images/icons/crop.png') }}" alt="Crop">
+                        </button>
+                        <button type="button" id="replaceImageBtn" class="preview-action-btn" title="Replace Image">
+                            <img src="{{ url_for('static', filename='images/icons/replace.png') }}" alt="Replace">
+                        </button>
+                    </div>
+                </div>
+                <input type="file" id="editImageFile" accept="image/*" style="display: none;">
             </div>
 
             <div class="modal-actions">
@@ -41,5 +53,26 @@
                 <button type="submit" class="btn-primary">Save Changes</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- Crop Modal -->
+<div id="cropModal" class="modal">
+    <div class="modal-content crop-modal-content">
+        <div class="modal-header">
+            <h2>Crop Image</h2>
+            <span class="modal-close" id="cropModalClose">
+                <img src="{{ url_for('static', filename='images/icons/close.png') }}" alt="Close">
+            </span>
+        </div>
+        
+        <div class="crop-container">
+            <img id="cropImage" src="" alt="Crop">
+        </div>
+        
+        <div class="modal-actions">
+            <button type="button" class="btn-secondary" id="cancelCrop">Cancel</button>
+            <button type="button" class="btn-primary" id="applyCrop">Apply Crop</button>
+        </div>
     </div>
 </div>

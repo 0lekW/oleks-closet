@@ -374,6 +374,15 @@ document.addEventListener('DOMContentLoaded', function() {
             if (viewModal.style.display === 'block') {
                 viewModal.style.display = 'none';
             }
+            // Close crop modal
+            const cropModal = document.getElementById('cropModal');
+            if (cropModal && cropModal.style.display === 'block') {
+                if (window.closeCropModal) {
+                    window.closeCropModal();
+                } else {
+                    cropModal.style.display = 'none';
+                }
+            }
         }
     });
 
