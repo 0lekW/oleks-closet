@@ -77,7 +77,17 @@ body.dark-mode::before {
     font-size: 0.95rem;
     background: white;
     cursor: pointer;
-    min-width: 350px;
+    min-width: 260px;
+}
+
+.header-sort {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: white;
+    cursor: pointer;
+    min-width: 140px;
 }
 
 .btn-add {
@@ -1104,7 +1114,8 @@ body.dark-mode .header-logo {
 }
 
 body.dark-mode .header-search,
-body.dark-mode .header-category {
+body.dark-mode .header-category,
+body.dark-mode .header-sort {
     background: #2d2d2d;
     border-color: #4a4a4a;
     color: #e0e0e0;
@@ -1233,7 +1244,7 @@ body.dark-mode .item-card-info .category {
 }
 
 /* Responsive Design for Mobile */
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
     /* Rearrange header when logo would overlap */
     .page-header {
         flex-direction: column;
@@ -1299,6 +1310,12 @@ body.dark-mode .item-card-info .category {
     /* Shrink category dropdown */
     .header-category {
         min-width: 100px;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .header-sort {
+        min-width: 120px;
         padding: 0.5rem 0.75rem;
         font-size: 0.85rem;
     }
@@ -1382,6 +1399,12 @@ body.dark-mode .item-card-info .category {
         font-size: 0.8rem;
         padding: 0.4rem 0.6rem;
         min-width: 80px;
+    }
+
+    .header-sort {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.6rem;
+        min-width: 100px;
     }
 
     .btn-add {

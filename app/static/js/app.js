@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const itemsGridContainer = document.getElementById('itemsGridContainer');
     const searchInput = document.getElementById('searchInput');
     const categoryFilter = document.getElementById('categoryFilter');
+    const sortFilter = document.getElementById('sortFilter');
     const builderToggle = document.getElementById('builderToggle');
     const builderPanel = document.getElementById('builderPanel');
     const editModal = document.getElementById('editModal');
@@ -114,10 +115,12 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadItems() {
         const category = categoryFilter.value;
         const search = searchInput.value;
+        const sort = sortFilter.value;
         
         let url = '/items?';
         if (category) url += `category=${category}&`;
         if (search) url += `search=${search}&`;
+        if (sort) url += `sort=${sort}&`;
         
         try {
             const response = await fetch(url);
@@ -283,6 +286,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Filter handlers
     searchInput.addEventListener('input', debounce(loadItems, 500));
     categoryFilter.addEventListener('change', loadItems);
+    sortFilter.addEventListener('change', loadItems);
 
     // Utility functions
     function debounce(func, wait) {
@@ -425,6 +429,16 @@ document.addEventListener('DOMContentLoaded', function() {
             darkModeIcon.src = '/static/images/icons/moon.png';
             localStorage.setItem('darkMode', 'disabled');
         }
+    });
+
+    // Load saved sort preference
+    const savedSort = localStorage.getItem('preferredSort');
+    if (savedSort && sortFilter) {
+        sortFilter.value = savedSort;
+    }
+
+    sortFilter.addEventListener('change', function() {
+        localStorage.setItem('preferredSort', this.value);
     });
 
     // Initial load

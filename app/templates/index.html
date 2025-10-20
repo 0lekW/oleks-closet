@@ -11,6 +11,13 @@
             <option value="{{ cat }}">{{ cat.title() }}</option>
             {% endfor %}
         </select>
+        <select id="sortFilter" class="header-sort">
+            <option value="random">🎲 Random</option>
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="name_asc">Name (A-Z)</option>
+            <option value="name_desc">Name (Z-A)</option>
+        </select>
         <button id="addButton" class="btn-add">+ ADD</button>
     </div>
      <div class="header-right">

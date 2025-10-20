@@ -49,31 +49,49 @@ def upload():
 
 @bp.route('/items')
 def list_items():
-    """Get all clothing items (with optional filtering)"""
+    """Get all clothing items (with optional filtering and sorting)"""
+    from sqlalchemy import func, desc, asc
+    
     category = request.args.get('category')
     search = request.args.get('search', '').strip()
+    sort_by = request.args.get('sort', 'random')  # random, newest, oldest, name_asc, name_desc
+    tag_filter = request.args.get('tag', '').strip()
     
     # Build query
     query = ClothingItem.query
     
+    # Apply filters
     if category:
         query = query.filter_by(category=category)
     
     if search:
         query = query.filter(ClothingItem.name.ilike(f'%{search}%'))
     
-    # Order by random if no filters, otherwise by most recent
-    if not category and not search:
-        # Random order when no filters applied
-        from sqlalchemy import func
+    if tag_filter:
+        # Filter by tag (case-insensitive partial match)
+        query = query.filter(ClothingItem.tags.ilike(f'%{tag_filter}%'))
+    
+    # Apply sorting
+    if sort_by == 'newest':
+        items = query.order_by(desc(ClothingItem.upload_date)).all()
+    elif sort_by == 'oldest':
+        items = query.order_by(asc(ClothingItem.upload_date)).all()
+    elif sort_by == 'name_asc':
+        items = query.order_by(asc(ClothingItem.name)).all()
+    elif sort_by == 'name_desc':
+        items = query.order_by(desc(ClothingItem.name)).all()
+    else:  # random (default)
         items = query.order_by(func.random()).all()
-    else:
-        # Most recent first when filtering
-        items = query.order_by(ClothingItem.upload_date.desc()).all()
     
     return jsonify({
         'items': [item.to_dict() for item in items],
-        'count': len(items)
+        'count': len(items),
+        'filters': {
+            'category': category,
+            'search': search,
+            'sort': sort_by,
+            'tag': tag_filter
+        }
     })
 
 
