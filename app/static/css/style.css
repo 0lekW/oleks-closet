@@ -114,6 +114,7 @@ body.dark-mode::before {
     height: 75px; /* Adjust this to your preferred size */
     width: auto;
     object-fit: contain;
+    margin-top: 10px;
 }
 
 body.dark-mode .header-logo-img {
