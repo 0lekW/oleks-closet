@@ -34,16 +34,30 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function openBuilder() {
-        builderPanel.classList.add('open');
-        builderToggle.classList.add('hidden');
-        itemsGridContainer.classList.add('builder-open');
-    }
+    builderPanel.classList.add('open');
+    builderToggle.classList.add('hidden');
+    itemsGridContainer.classList.add('builder-open');
+    
+    // Recalculate Masonry layout
+    setTimeout(() => {
+        if (window.masonryInstance) {
+            window.masonryInstance.layout();
+        }
+    }, 200); // Wait for CSS transition to finish
+}
 
-    function closeBuilder() {
-        builderPanel.classList.remove('open');
-        builderToggle.classList.remove('hidden');
-        itemsGridContainer.classList.remove('builder-open');
-    }
+function closeBuilder() {
+    builderPanel.classList.remove('open');
+    builderToggle.classList.remove('hidden');
+    itemsGridContainer.classList.remove('builder-open');
+    
+    // Recalculate Masonry layout
+    setTimeout(() => {
+        if (window.masonryInstance) {
+            window.masonryInstance.layout();
+        }
+    }, 200); // Wait for CSS transition to finish
+}
 
     // Add button - open modal
     addButton.addEventListener('click', function() {
