@@ -153,24 +153,18 @@ body.dark-mode .header-logo-img {
     margin-right: 40%;
 }
 
-.items-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    grid-auto-flow: dense;
-    gap: 1.5rem;
-    padding-bottom: 2rem;
-}
-
 /* Item Cards */
 .item-card {
+    width: 220px; /* Fixed width for each item */
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
     background: transparent;
     border: none;
     border-radius: 12px;
     overflow: visible;
     cursor: pointer;
     position: relative;
-    display: flex;
-    flex-direction: column;
 }
 
 .item-card-actions {

@@ -170,6 +170,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
         `).join('');
+
+        setTimeout(() => {
+            const msnry = new Masonry(itemsGrid, {
+                itemSelector: '.item-card',
+                columnWidth: 220,
+                gutter: 24,
+                fitWidth: true
+                //transitionDuration: 0
+            });
+            
+            // Store reference for resize
+            window.masonryInstance = msnry;
+        }, 100);
     }
 
     // Add function for mobile tap-to-add
@@ -439,6 +452,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     sortFilter.addEventListener('change', function() {
         localStorage.setItem('preferredSort', this.value);
+    });
+
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            if (window.masonryInstance) {
+                window.masonryInstance.layout();
+            }
+        }, 1); // Very short delay
     });
 
     // Initial load
