@@ -171,6 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `).join('');
 
+        // Initialize Masonry
         setTimeout(() => {
             const msnry = new Masonry(itemsGrid, {
                 itemSelector: '.item-card',
@@ -180,8 +181,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 //transitionDuration: 0
             });
             
-            // Store reference for resize
             window.masonryInstance = msnry;
+            
+            // Re-layout after images load
+            const images = itemsGrid.querySelectorAll('img');
+            let loadedCount = 0;
+            images.forEach(img => {
+                if (img.complete) {
+                    loadedCount++;
+                    if (loadedCount === images.length) msnry.layout();
+                } else {
+                    img.addEventListener('load', () => {
+                        loadedCount++;
+                        if (loadedCount === images.length) msnry.layout();
+                    });
+                }
+            });
         }, 100);
     }
 
