@@ -244,10 +244,7 @@ docker-compose up -d
 
 ### Dev TODO list:
 - Replace SVG
-- Cards should use card above them for their y position
 - Save outfits in database
 - Auto categorise items
 - Non random outfit generation
 - Allow multiple photos for a single item
-- Mobile usage in general sucks
-- Upload a Docker image to hub
