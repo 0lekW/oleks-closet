@@ -62,8 +62,14 @@ def list_items():
     if search:
         query = query.filter(ClothingItem.name.ilike(f'%{search}%'))
     
-    # Order by most recent first
-    items = query.order_by(ClothingItem.upload_date.desc()).all()
+    # Order by random if no filters, otherwise by most recent
+    if not category and not search:
+        # Random order when no filters applied
+        from sqlalchemy import func
+        items = query.order_by(func.random()).all()
+    else:
+        # Most recent first when filtering
+        items = query.order_by(ClothingItem.upload_date.desc()).all()
     
     return jsonify({
         'items': [item.to_dict() for item in items],
