@@ -24,7 +24,7 @@ https://hub.docker.com/repository/docker/0iek/oleks-closet/general
 
 1. **Clone the repository**
    ```bash
-   git clone <url>
+   git clone https://github.com/0lekW/oleks-closet
    cd oleks-closet
    ```
 
@@ -248,3 +248,10 @@ docker-compose up -d
 - Auto categorise items
 - Non random outfit generation
 - Allow multiple photos for a single item
+  
+Builder panel rebuild:
+- Clear all in builder panel
+- Mobile re-tap to remove items
+- Tap to add/remove for web version + icon for preview (replacing tap)
+- Remove permanent X on web (mobile only)
+- Better builder panel layout in general
